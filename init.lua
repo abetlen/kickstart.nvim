@@ -192,9 +192,8 @@ vim.cmd [[autocmd FocusGained,BufEnter * checktime]]
 
 -- Autocmds for terminal
 vim.cmd [[
-  autocmd TermOpen * setlocal nonumber norelativenumber
+  autocmd TermOpen * setlocal nonumber norelativenumber signcolumn=no
   autocmd BufWinEnter,WinEnter term://* startinsert
-  autocmd TermClose * execute 'bdelete! ' . expand('<abuf>')
 ]]
 
 -- Resize window mappings
@@ -307,6 +306,9 @@ require('lazy').setup({
       vim.api.nvim_set_keymap('v', '<leader>l', '<Plug>(easymotion-jumptoanywhere)', {})
       vim.api.nvim_set_keymap('v', '<leader>h', '<Plug>(easymotion-jumptoanywhere)', {})
     end,
+  },
+  {
+    'tpope/vim-fugitive',
   },
   {
     'tpope/vim-vinegar',
@@ -682,7 +684,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         clangd = {},
-        -- gopls = {},
+        gopls = {},
         pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -919,7 +921,14 @@ require('lazy').setup({
   {
     'flazz/vim-colorschemes',
     config = function()
-      vim.cmd.colorscheme 'materialbox'
+      --- set background to light
+      -- vim.cmd 'set background=light'
+      -- vim.cmd.colorscheme 'github'
+
+      ---
+      -- vim.cmd.colorscheme 'materialbox'
+      vim.cmd.colorscheme 'gotham'
+      vim.cmd 'set background=dark'
     end,
   },
 
@@ -1040,3 +1049,32 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+--
+vim.opt.tabstop = 4 -- Size of a hard tabstop (ts)
+vim.opt.shiftwidth = 4 -- Size of an indentation (sw)
+vim.opt.expandtab = true -- Always use spaces instead of tabs
+vim.opt.softtabstop = 4 -- Number of spaces a <Tab> counts for
+
+-- Set specific settings for Makefiles (must use tabs)
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'make',
+  callback = function()
+    vim.opt_local.tabstop = 4 -- Size of a hard tabstop
+    vim.opt_local.shiftwidth = 4 -- Size of an indentation
+    vim.opt_local.expandtab = false -- Use tabs instead of spaces
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'go',
+  callback = function()
+    vim.opt_local.list = false -- Disable list mode for Go files
+  end,
+})
+
+vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
+  pattern = '*.mdx',
+  callback = function()
+    vim.bo.filetype = 'markdown'
+  end,
+})
